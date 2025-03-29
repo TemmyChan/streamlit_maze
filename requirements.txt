@@ -3,3 +3,4 @@ networkx
 matplotlib
 pillow
 numpy
+streamlit_js_eval

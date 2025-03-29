@@ -41,41 +41,32 @@ SIZE = 10
 maze = generate_maze(SIZE)
 start_pos = (0, 0)
 goal_pos = (SIZE-1, SIZE-1)
-player_pos = st.session_state.get("player_pos", start_pos)
 
-# キーボード入力
-keys = st.session_state.get("keys", {})
+# プレイヤーの初期位置をセッションに保存
+if "player_pos" not in st.session_state:
+    st.session_state["player_pos"] = start_pos
 
+# キーボード入力を受け取る
+key = st.text_input("矢印キーを入力（←, →, ↑, ↓）して Enter を押してください:")
+
+# プレイヤーの位置を更新
 def update_position():
-    global player_pos
-    x, y = player_pos
-    if keys.get("left", False) and (x-1, y) in maze.nodes and ((x, y), (x-1, y)) in maze.edges:
-        player_pos = (x-1, y)
-    if keys.get("right", False) and (x+1, y) in maze.nodes and ((x, y), (x+1, y)) in maze.edges:
-        player_pos = (x+1, y)
-    if keys.get("up", False) and (x, y-1) in maze.nodes and ((x, y), (x, y-1)) in maze.edges:
-        player_pos = (x, y-1)
-    if keys.get("down", False) and (x, y+1) in maze.nodes and ((x, y), (x, y+1)) in maze.edges:
-        player_pos = (x, y+1)
-    
-    st.session_state["player_pos"] = player_pos
-
-# キーボード入力のキャプチャ
-st.text("矢印キーで移動")
-
-keys["left"] = st.button("←")
-keys["right"] = st.button("→")
-keys["up"] = st.button("↑")
-keys["down"] = st.button("↓")
-
-st.session_state["keys"] = keys
+    x, y = st.session_state["player_pos"]
+    if key == "←" and (x-1, y) in maze.nodes and ((x, y), (x-1, y)) in maze.edges:
+        st.session_state["player_pos"] = (x-1, y)
+    if key == "→" and (x+1, y) in maze.nodes and ((x, y), (x+1, y)) in maze.edges:
+        st.session_state["player_pos"] = (x+1, y)
+    if key == "↑" and (x, y-1) in maze.nodes and ((x, y), (x, y-1)) in maze.edges:
+        st.session_state["player_pos"] = (x, y-1)
+    if key == "↓" and (x, y+1) in maze.nodes and ((x, y), (x, y+1)) in maze.edges:
+        st.session_state["player_pos"] = (x, y+1)
 
 update_position()
 
 # 迷路を描画して表示
-maze_image = draw_maze(maze, SIZE, player_pos, goal_pos)
+maze_image = draw_maze(maze, SIZE, st.session_state["player_pos"], goal_pos)
 st.image(maze_image)
 
 # ゴール判定
-if player_pos == goal_pos:
+if st.session_state["player_pos"] == goal_pos:
     st.success("ゴール！おめでとう！")
